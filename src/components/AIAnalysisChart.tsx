@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { Brain, Clock, TrendingUp, Lightbulb, AlertCircle } from 'lucide-react';
@@ -119,7 +118,7 @@ export const AIAnalysisChart = ({ scheduleData }: AIAnalysisChartProps) => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={analysis.optimalFocusHours}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="hour" formatter={(value) => `${value}시`} />
+                  <XAxis dataKey="hour" tickFormatter={(value) => `${value}시`} />
                   <YAxis />
                   <Tooltip 
                     formatter={(value, name) => [value, '집중도 점수']}
