@@ -2,7 +2,7 @@
 
 ## 🚀 배포 페이지 
 
-[**페이지 이동하기**](https://lovable.dev/projects/f1f63b50-6fa5-4e65-b80b-15fd29fa83b5)
+[**페이지 이동하기**](https://chapter-schedule-planner.lovable.app/)
 
 <br>
 
