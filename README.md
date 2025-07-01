@@ -1,5 +1,7 @@
 # planner-prototype
 
+일정 관리에 어려움을 겪는 사람들을 위한 서비스
+
 ## 🚀 배포 페이지 
 
 [**페이지 이동하기**](https://chapter-schedule-planner.lovable.app/)
