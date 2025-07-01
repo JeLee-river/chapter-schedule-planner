@@ -7,6 +7,7 @@ import { ProgressTracker } from '@/components/ProgressTracker';
 import { RewardSystem } from '@/components/RewardSystem';
 import { StatsReport } from '@/components/StatsReport';
 import { TaskManager } from '@/components/TaskManager';
+import { AIAnalysisChart } from '@/components/AIAnalysisChart';
 
 const Index = () => {
   const [currentPoints, setCurrentPoints] = useState(120);
@@ -84,6 +85,9 @@ const Index = () => {
             <RewardSystem currentPoints={currentPoints} />
           </div>
         </div>
+
+        {/* AI 분석 차트 */}
+        <AIAnalysisChart scheduleData={todayTasks} />
 
         {/* 하단: 통계 및 리포트 */}
         <StatsReport />
