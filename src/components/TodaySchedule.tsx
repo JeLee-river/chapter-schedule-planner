@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -13,6 +12,7 @@ interface Task {
   timeSlot: string;
   completed: boolean;
   locked: boolean;
+  priority: string;
 }
 
 interface TodayScheduleProps {

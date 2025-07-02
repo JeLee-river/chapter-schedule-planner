@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ProgressTracker } from '@/components/ProgressTracker';
 import { PomodoroTimer } from '@/components/PomodoroTimer';
@@ -15,6 +14,10 @@ const Index = () => {
     { id: 3, title: '클라이언트 미팅', duration: 45, timeSlot: '14:00', completed: false, locked: false },
     { id: 4, title: '코드 리뷰', duration: 30, timeSlot: '16:00', completed: false, locked: true },
   ];
+
+  const handlePointsChange = (newPoints: number) => {
+    setCurrentPoints(newPoints);
+  };
 
   const quickActions = [
     { title: '오늘 일정', icon: Calendar, path: '/today', color: 'from-blue-500 to-blue-600' },
@@ -82,7 +85,10 @@ const Index = () => {
         
         <div className="space-y-6">
           <PomodoroTimer />
-          <RewardSystem currentPoints={currentPoints} />
+          <RewardSystem 
+            currentPoints={currentPoints} 
+            onPointsChange={handlePointsChange}
+          />
         </div>
       </div>
 
