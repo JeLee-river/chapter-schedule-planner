@@ -3,13 +3,16 @@ import { useState } from 'react';
 import { Gift, Star, Palette, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 interface RewardSystemProps {
   currentPoints: number;
+  onPointsChange: (newPoints: number) => void;
 }
 
-export const RewardSystem = ({ currentPoints }: RewardSystemProps) => {
+export const RewardSystem = ({ currentPoints, onPointsChange }: RewardSystemProps) => {
   const [ownedItems, setOwnedItems] = useState<string[]>(['basic-theme']);
+  const { toast } = useToast();
 
   const rewards = [
     { id: 'sticker-pack-1', name: '스티커 팩 #1', cost: 50, type: 'sticker', icon: '🎨' },
@@ -17,13 +20,26 @@ export const RewardSystem = ({ currentPoints }: RewardSystemProps) => {
     { id: 'productivity-badge', name: '생산성 마스터', cost: 200, type: 'badge', icon: '🏆' },
     { id: 'sticker-pack-2', name: '프리미엄 스티커', cost: 150, type: 'sticker', icon: '✨' },
     { id: 'dark-theme', name: '다크 테마', cost: 120, type: 'theme', icon: '🌙' },
+    { id: 'focus-badge', name: '집중력 챔피언', cost: 300, type: 'badge', icon: '🎯' },
+    { id: 'rainbow-theme', name: '레인보우 테마', cost: 180, type: 'theme', icon: '🌈' },
+    { id: 'premium-stickers', name: '특별 이모지 팩', cost: 80, type: 'sticker', icon: '🚀' },
   ];
 
-  const handlePurchase = (rewardId: string, cost: number) => {
+  const handlePurchase = (rewardId: string, cost: number, name: string) => {
     if (currentPoints >= cost && !ownedItems.includes(rewardId)) {
       setOwnedItems(prev => [...prev, rewardId]);
-      // 실제로는 부모 컴포넌트에서 포인트를 차감해야 함
-      console.log(`구매 완료: ${rewardId}, 비용: ${cost}`);
+      onPointsChange(currentPoints - cost);
+      
+      toast({
+        title: "구매 완료! 🎉",
+        description: `"${name}"을(를) 성공적으로 구매했습니다!`,
+      });
+    } else if (currentPoints < cost) {
+      toast({
+        title: "포인트가 부족합니다",
+        description: `${cost - currentPoints} 포인트가 더 필요합니다.`,
+        variant: "destructive",
+      });
     }
   };
 
@@ -86,7 +102,7 @@ export const RewardSystem = ({ currentPoints }: RewardSystemProps) => {
                   <Button
                     size="sm"
                     disabled={!canAfford}
-                    onClick={() => handlePurchase(reward.id, reward.cost)}
+                    onClick={() => handlePurchase(reward.id, reward.cost, reward.name)}
                     className={
                       canAfford 
                         ? "bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700" 
@@ -104,7 +120,7 @@ export const RewardSystem = ({ currentPoints }: RewardSystemProps) => {
 
       <div className="mt-4 pt-4 border-t border-gray-200">
         <p className="text-xs text-gray-500 text-center">
-          💡 작업 완료 시 10 포인트, 포모도로 세션 완료 시 25 포인트를 획득합니다
+          💡 작업 완료 시 우선순위에 따라 5-15 포인트를 획득합니다
         </p>
       </div>
     </div>
