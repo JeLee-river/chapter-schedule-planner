@@ -4,19 +4,33 @@ import { Plus, Settings, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
-export const TaskManager = () => {
+interface TaskManagerProps {
+  onAddTask: (task: { title: string; duration: number; priority: string }) => void;
+}
+
+export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
   const [newTask, setNewTask] = useState('');
   const [taskDuration, setTaskDuration] = useState('30');
   const [taskPriority, setTaskPriority] = useState('medium');
+  const { toast } = useToast();
 
   const handleAddTask = () => {
     if (newTask.trim()) {
-      console.log('새 작업 추가:', {
+      const taskData = {
         title: newTask,
-        duration: taskDuration,
+        duration: parseInt(taskDuration),
         priority: taskPriority
+      };
+      
+      onAddTask(taskData);
+      
+      toast({
+        title: "작업이 추가되었습니다",
+        description: `"${newTask}"이(가) 오늘 일정에 추가되었습니다.`,
       });
+      
       setNewTask('');
     }
   };

@@ -3,8 +3,17 @@ import { useState } from 'react';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { TaskManager } from '@/components/TaskManager';
 
+interface Task {
+  id: number;
+  title: string;
+  duration: number;
+  timeSlot: string;
+  completed: boolean;
+  locked: boolean;
+}
+
 const TodaySchedulePage = () => {
-  const [todayTasks, setTodayTasks] = useState([
+  const [todayTasks, setTodayTasks] = useState<Task[]>([
     { id: 1, title: '아침 운동', duration: 30, timeSlot: '07:00', completed: false, locked: false },
     { id: 2, title: '프로젝트 기획서 작성', duration: 60, timeSlot: '09:00', completed: false, locked: false },
     { id: 3, title: '클라이언트 미팅', duration: 45, timeSlot: '14:00', completed: false, locked: true },
@@ -27,6 +36,33 @@ const TodaySchedulePage = () => {
     }));
   };
 
+  const handleAddTask = (newTask: { title: string; duration: number; priority: string }) => {
+    const nextId = Math.max(...todayTasks.map(t => t.id)) + 1;
+    const nextTimeSlot = generateNextTimeSlot();
+    
+    const task: Task = {
+      id: nextId,
+      title: newTask.title,
+      duration: newTask.duration,
+      timeSlot: nextTimeSlot,
+      completed: false,
+      locked: todayTasks.length > 0 && !todayTasks[todayTasks.length - 1].completed
+    };
+
+    setTodayTasks(prev => [...prev, task]);
+  };
+
+  const generateNextTimeSlot = (): string => {
+    if (todayTasks.length === 0) return '09:00';
+    
+    const lastTask = todayTasks[todayTasks.length - 1];
+    const [hours, minutes] = lastTask.timeSlot.split(':').map(Number);
+    const lastTaskEnd = new Date();
+    lastTaskEnd.setHours(hours, minutes + lastTask.duration);
+    
+    return lastTaskEnd.toTimeString().slice(0, 5);
+  };
+
   return (
     <div className="container mx-auto px-4 py-6 space-y-8">
       <div className="mb-6">
@@ -44,7 +80,7 @@ const TodaySchedulePage = () => {
         </div>
         
         <div>
-          <TaskManager />
+          <TaskManager onAddTask={handleAddTask} />
         </div>
       </div>
     </div>

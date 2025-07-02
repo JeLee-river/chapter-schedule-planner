@@ -1,11 +1,25 @@
 
+import { useState } from 'react';
 import { Zap, Users, Calendar, Vote } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { CreateChallengeDialog } from '@/components/CreateChallengeDialog';
+import { useToast } from '@/hooks/use-toast';
+
+interface Challenge {
+  id: number;
+  title: string;
+  description: string;
+  progress?: number;
+  votes?: number;
+  participants: number;
+  deadline: string;
+  status: 'active' | 'voting' | 'completed';
+}
 
 export const GroupChallenge = () => {
-  const challenges = [
+  const [challenges, setChallenges] = useState<Challenge[]>([
     {
       id: 1,
       title: '팀 집중 챌린지',
@@ -24,13 +38,51 @@ export const GroupChallenge = () => {
       deadline: '1일 남음',
       status: 'voting'
     }
-  ];
+  ]);
+
+  const { toast } = useToast();
 
   const meetingOptions = [
     { time: '월요일 10:00', votes: 3 },
     { time: '화요일 14:00', votes: 5 },
     { time: '수요일 16:00', votes: 4 }
   ];
+
+  const handleCreateChallenge = (newChallenge: {
+    title: string;
+    description: string;
+    type: string;
+    duration: string;
+  }) => {
+    const challenge: Challenge = {
+      id: challenges.length + 1,
+      title: newChallenge.title,
+      description: newChallenge.description,
+      progress: 0,
+      participants: 1,
+      deadline: getDurationText(newChallenge.duration),
+      status: 'active'
+    };
+
+    setChallenges(prev => [...prev, challenge]);
+  };
+
+  const getDurationText = (duration: string): string => {
+    switch (duration) {
+      case '3days': return '3일 남음';
+      case '1week': return '7일 남음';
+      case '2weeks': return '14일 남음';
+      case '1month': return '30일 남음';
+      default: return '1주일 남음';
+    }
+  };
+
+  const handleVote = (optionIndex: number) => {
+    toast({
+      title: "투표가 완료되었습니다",
+      description: `${meetingOptions[optionIndex].time}에 투표하셨습니다.`,
+    });
+  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
@@ -69,7 +121,7 @@ export const GroupChallenge = () => {
               </Badge>
             </div>
 
-            {challenge.status === 'active' && (
+            {challenge.status === 'active' && challenge.progress !== undefined && (
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">진행률</span>
@@ -92,7 +144,13 @@ export const GroupChallenge = () => {
                       <span className="text-sm">{option.time}</span>
                       <div className="flex items-center space-x-2">
                         <span className="text-sm text-gray-500">{option.votes}표</span>
-                        <Button size="sm" variant="outline">투표</Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleVote(index)}
+                        >
+                          투표
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -102,9 +160,7 @@ export const GroupChallenge = () => {
           </div>
         ))}
 
-        <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600">
-          새 챌린지 만들기
-        </Button>
+        <CreateChallengeDialog onCreateChallenge={handleCreateChallenge} />
       </div>
     </div>
   );
