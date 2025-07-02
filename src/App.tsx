@@ -7,8 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Header } from "@/components/Header";
-import Index from "./pages/Index";
-import TodaySchedulePage from "./pages/TodaySchedulePage";
+import DashboardPage from "./pages/DashboardPage";
 import TimerNotificationPage from "./pages/TimerNotificationPage";
 import ReportPage from "./pages/ReportPage";
 import RewardPage from "./pages/RewardPage";
@@ -37,8 +36,7 @@ const App = () => (
               </header>
               <main className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/today" element={<TodaySchedulePage />} />
+                  <Route path="/" element={<DashboardPage />} />
                   <Route path="/timer" element={<TimerNotificationPage />} />
                   <Route path="/reports" element={<ReportPage />} />
                   <Route path="/rewards" element={<RewardPage />} />

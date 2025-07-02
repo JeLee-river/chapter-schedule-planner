@@ -21,14 +21,22 @@ import {
 
 const menuItems = [
   { title: "대시보드", url: "/", icon: Home },
-  { title: "오늘 일정", url: "/today", icon: Calendar },
-  { title: "타이머 & 알림", url: "/timer", icon: Timer },
+];
+
+const reportMenuItems = [
   { title: "리포트", url: "/reports", icon: BarChart3 },
-  { title: "리워드", url: "/rewards", icon: Gift },
+];
+
+const activityAndCommunityMenuItems = [
   { title: "소셜 & 팀", url: "/social", icon: Users },
+  { title: "리워드", url: "/rewards", icon: Gift },
+];
+
+const settingsMenuItems = [
   { title: "캘린더 연동", url: "/calendar", icon: CalendarDays },
-  { title: "설정", url: "/settings", icon: Settings },
-]
+  { title: "타이머 & 알림", url: "/timer", icon: Timer },
+  { title: "일반 설정", url: "/settings", icon: Settings },
+];
 
 export function AppSidebar() {
   const { state } = useSidebar()
@@ -47,10 +55,64 @@ export function AppSidebar() {
     >
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>메뉴</SidebarGroupLabel>
+          <SidebarGroupLabel>메인</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>분석 및 리포트</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {reportMenuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>활동 및 커뮤니티</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {activityAndCommunityMenuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink to={item.url} end className={getNavCls}>
+                      <item.icon className="mr-2 h-4 w-4" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>설정</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {settingsMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink to={item.url} end className={getNavCls}>

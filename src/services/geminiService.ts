@@ -1,19 +1,7 @@
 
 interface GeminiAnalysisRequest {
-  userScheduleData: {
-    completedTasks: Array<{
-      title: string;
-      startTime: string;
-      endTime: string;
-      focusScore: number;
-      date: string;
-    }>;
-    weeklyPattern: Array<{
-      day: string;
-      productivity: number;
-      focusTime: number;
-    }>;
-  };
+  userScheduleData: any[];
+  delayedTasks: any[];
 }
 
 interface GeminiAnalysisResponse {
@@ -29,25 +17,28 @@ interface GeminiAnalysisResponse {
     efficiency: number;
     taskType: string;
   }>;
+  delayedTaskAnalysis?: Array<{
+    task: string;
+    analysis: string;
+    recommendation: string;
+  }>;
 }
 
 export class GeminiService {
-  private apiKey: string;
+  private apiKey = "YOUR_API_KEY"; // 여기에 실제 API 키를 입력하세요.
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-thinking-exp:generateContent';
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-  }
+  constructor() {}
 
   async analyzeSchedulePattern(data: GeminiAnalysisRequest): Promise<GeminiAnalysisResponse> {
     const prompt = `
-    다음 사용자의 일정 데이터를 분석해서 최적의 집중 시간대와 생산성 패턴을 찾아주세요:
+    다음 사용자의 일정 데이터와 지연된 작업 목록을 분석하여 최적의 집중 시간대, 생산성 패턴, 그리고 지연된 작업에 대한 분석 및 조치 추천을 제공해주세요:
 
-    완료된 작업들:
-    ${JSON.stringify(data.userScheduleData.completedTasks, null, 2)}
+    사용자 일정 데이터:
+    ${JSON.stringify(data.userScheduleData, null, 2)}
 
-    주간 패턴:
-    ${JSON.stringify(data.userScheduleData.weeklyPattern, null, 2)}
+    지연된 작업:
+    ${JSON.stringify(data.delayedTasks, null, 2)}
 
     다음 형식의 JSON으로 응답해주세요:
     {
@@ -66,6 +57,13 @@ export class GeminiService {
       "focusPatterns": [
         {"timeSlot": "09:00-11:00", "efficiency": 92, "taskType": "창작 업무"},
         {"timeSlot": "14:00-16:00", "efficiency": 78, "taskType": "관리 업무"}
+      ],
+      "delayedTaskAnalysis": [
+        {
+          "task": "지연된 작업 제목",
+          "analysis": "이 작업은 사용자의 집중력이 낮은 시간대에 배치되어 지연된 것으로 보입니다.",
+          "recommendation": "이 작업을 최적 집중 시간대인 오전 9시로 재배치하는 것을 권장합니다."
+        }
       ]
     }
     `;
@@ -111,3 +109,4 @@ export class GeminiService {
     }
   }
 }
+

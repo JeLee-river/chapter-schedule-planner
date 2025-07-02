@@ -1,27 +1,26 @@
-
+import { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { Activity, TrendingUp, Clock, Target } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
-export const StatsReport = () => {
-  const weeklyData = [
-    { day: '월', completed: 6, planned: 8, focusTime: 120 },
-    { day: '화', completed: 8, planned: 8, focusTime: 180 },
-    { day: '수', completed: 5, planned: 7, focusTime: 90 },
-    { day: '목', completed: 7, planned: 8, focusTime: 150 },
-    { day: '금', completed: 9, planned: 10, focusTime: 200 },
-    { day: '토', completed: 4, planned: 5, focusTime: 80 },
-    { day: '일', completed: 3, planned: 4, focusTime: 60 },
-  ];
+interface StatsReportProps {
+  weeklyData: any[];
+  focusTimeData: any[];
+  stats: {
+    achievementRate: number;
+    totalFocusTime: string;
+    completedTasks: number;
+    pomodoroSessions: number;
+  };
+  aiInsights: string[];
+}
 
-  const focusTimeData = [
-    { time: '09:00', focus: 85 },
-    { time: '10:00', focus: 95 },
-    { time: '11:00', focus: 75 },
-    { time: '14:00', focus: 60 },
-    { time: '15:00', focus: 80 },
-    { time: '16:00', focus: 90 },
-    { time: '17:00', focus: 70 },
-  ];
+export const StatsReport = ({ weeklyData, focusTimeData, stats, aiInsights }: StatsReportProps) => {
+  const [selectedDay, setSelectedDay] = useState<any>(null);
+
+  const handleBarClick = (data: any) => {
+    setSelectedDay(data.activePayload[0].payload);
+  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
@@ -36,7 +35,7 @@ export const StatsReport = () => {
             <Target className="w-5 h-5 text-blue-600" />
             <span className="text-sm font-medium text-blue-800">이번 주 달성률</span>
           </div>
-          <div className="text-2xl font-bold text-blue-900">87%</div>
+          <div className="text-2xl font-bold text-blue-900">{stats.achievementRate}%</div>
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
@@ -44,7 +43,7 @@ export const StatsReport = () => {
             <Clock className="w-5 h-5 text-green-600" />
             <span className="text-sm font-medium text-green-800">총 집중 시간</span>
           </div>
-          <div className="text-2xl font-bold text-green-900">12.2시간</div>
+          <div className="text-2xl font-bold text-green-900">{stats.totalFocusTime}</div>
         </div>
 
         <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
@@ -52,7 +51,7 @@ export const StatsReport = () => {
             <TrendingUp className="w-5 h-5 text-purple-600" />
             <span className="text-sm font-medium text-purple-800">완료한 작업</span>
           </div>
-          <div className="text-2xl font-bold text-purple-900">42개</div>
+          <div className="text-2xl font-bold text-purple-900">{stats.completedTasks}개</div>
         </div>
 
         <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
@@ -60,7 +59,7 @@ export const StatsReport = () => {
             <Activity className="w-5 h-5 text-orange-600" />
             <span className="text-sm font-medium text-orange-800">포모도로 세션</span>
           </div>
-          <div className="text-2xl font-bold text-orange-900">28회</div>
+          <div className="text-2xl font-bold text-orange-900">{stats.pomodoroSessions}회</div>
         </div>
       </div>
 
@@ -70,12 +69,12 @@ export const StatsReport = () => {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">주간 작업 완료 현황</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyData}>
+              <BarChart data={weeklyData} onClick={handleBarClick}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="completed" fill="#3B82F6" name="완료" />
+                <Bar dataKey="completed" fill="#3B82F6" name="완료" cursor="pointer" />
                 <Bar dataKey="planned" fill="#E5E7EB" name="계획" />
               </BarChart>
             </ResponsiveContainer>
@@ -110,12 +109,26 @@ export const StatsReport = () => {
       <div className="mt-8 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
         <h4 className="font-semibold text-indigo-800 mb-2">🤖 AI 인사이트</h4>
         <ul className="text-sm text-indigo-700 space-y-1">
-          <li>• 오전 10-11시에 가장 높은 집중도를 보입니다</li>
-          <li>• 금요일에 가장 생산적인 패턴을 보입니다</li>
-          <li>• 주말 휴식 후 월요일 집중도가 향상됩니다</li>
-          <li>• 15분 단위 작업 분할이 효과적입니다</li>
+          {aiInsights.map((insight, index) => (
+            <li key={index}>• {insight}</li>
+          ))}
         </ul>
       </div>
+
+      <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selectedDay?.day}요일 상세 내역</DialogTitle>
+          </DialogHeader>
+          {selectedDay && (
+            <div>
+              <p><strong>계획된 작업:</strong> {selectedDay.planned}개</p>
+              <p><strong>완료된 작업:</strong> {selectedDay.completed}개</p>
+              <p><strong>집중 시간:</strong> {selectedDay.focusTime}분</p>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

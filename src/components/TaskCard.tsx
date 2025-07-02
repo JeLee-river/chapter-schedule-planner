@@ -90,11 +90,17 @@ export const TaskCard = ({ task, onComplete }: TaskCardProps) => {
         {/* 상태 아이콘 */}
         <div className="flex-shrink-0">
           {task.completed ? (
-            <CheckCircle className="w-6 h-6 text-green-500" />
+            <CheckCircle
+              className="w-6 h-6 text-green-500 cursor-pointer"
+              onClick={() => { !task.locked && onComplete(); }}
+            />
           ) : task.locked ? (
             <Lock className="w-6 h-6 text-gray-400" />
           ) : (
-            <div className="w-6 h-6 border-2 border-gray-300 rounded-full"></div>
+            <div
+              className="w-6 h-6 border-2 border-gray-300 rounded-full cursor-pointer hover:bg-gray-100"
+              onClick={() => { !task.locked && onComplete(); }}
+            ></div>
           )}
         </div>
 
@@ -122,7 +128,7 @@ export const TaskCard = ({ task, onComplete }: TaskCardProps) => {
               <span>{task.timeSlot}</span>
             </div>
             <span>{task.duration}분</span>
-            {!task.completed && (
+            {!task.completed && ( // 완료되지 않았을 때만 포인트 표시
               <div className="flex items-center space-x-1 text-blue-600">
                 <Star className="w-3 h-3" />
                 <span className="text-xs font-medium">+{getPoints(task.priority)}P</span>
@@ -132,14 +138,19 @@ export const TaskCard = ({ task, onComplete }: TaskCardProps) => {
           </div>
         </div>
 
-        {/* 완료 버튼 */}
-        {!task.completed && !task.locked && (
+        {/* 완료/취소 버튼 */}
+        {!task.locked && (
           <Button
             onClick={onComplete}
             size="sm"
-            className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+            className={cn(
+              "bg-gradient-to-r",
+              task.completed
+                ? "from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
+                : "from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+            )}
           >
-            완료
+            {task.completed ? "취소" : "완료"}
           </Button>
         )}
       </div>
