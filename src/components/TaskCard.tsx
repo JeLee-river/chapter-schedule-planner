@@ -25,24 +25,13 @@ interface TaskCardProps {
   task: Task;
   onComplete: () => void;
   isDragging?: boolean; // Add isDragging prop
+  onStartTimer?: (taskId: number | string) => void; // onStartTimer prop 추가
+  attributes?: any; // attributes prop 추가
+  listeners?: any; // listeners prop 추가
 }
 
-export const TaskCard = ({ task, onComplete, isDragging: propIsDragging }: TaskCardProps) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging: sortableIsDragging, // Rename to avoid conflict
-  } = useSortable({ id: task.id });
-
-  const isDragging = propIsDragging || sortableIsDragging; // Use propIsDragging if available, otherwise use sortableIsDragging
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+export const TaskCard = ({ task, onComplete, isDragging: propIsDragging, onStartTimer, attributes, listeners }: TaskCardProps) => {
+  const isDragging = propIsDragging; // useSortable 훅 제거로 인한 변경
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -73,8 +62,6 @@ export const TaskCard = ({ task, onComplete, isDragging: propIsDragging }: TaskC
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
       className={cn(
         "bg-white rounded-lg border-2 p-4 shadow-sm transition-all duration-200",
         {
@@ -141,19 +128,37 @@ export const TaskCard = ({ task, onComplete, isDragging: propIsDragging }: TaskC
           </div>
         </div>
 
-        {/* 완료/취소 버튼 */}
-        <Button
-            onClick={() => onComplete()}
-            size="sm"
-            className={cn(
-              "bg-gradient-to-r",
-              task.completed
-                ? "from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
-                : "from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
-            )}
-          >
-            {task.completed ? "취소" : "완료"}
-          </Button>
+        {/* 완료/취소 버튼 및 타이머 시작 버튼 */}
+        <div className="flex flex-col space-y-2">
+          {onStartTimer && (
+            <Button
+              onClick={() => {
+                onStartTimer(task.id);
+              }}
+              size="sm"
+              className={cn(
+                task.pomodoroActive
+                  ? "bg-red-500 hover:bg-red-600"
+                  : "bg-blue-500 hover:bg-blue-600",
+                "text-white"
+              )}
+            >
+              {task.pomodoroActive ? "타이머 비활성화" : "타이머 활성화"}
+            </Button>
+          )}
+          <Button
+              onClick={() => onComplete()}
+              size="sm"
+              className={cn(
+                "bg-gradient-to-r",
+                task.completed
+                  ? "from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600"
+                  : "from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600"
+              )}
+            >
+              {task.completed ? "취소" : "완료"}
+            </Button>
+        </div>
       </div>
 
       {task.completed && (

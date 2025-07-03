@@ -12,7 +12,7 @@ import {
 } from '@dnd-kit/sortable';
 import { TodaySchedule } from '@/components/TodaySchedule';
 import { TaskManager } from '@/components/TaskManager';
-import { PomodoroTimer } from '@/components/PomodoroTimer';
+
 import { DroppableArea } from '@/components/DroppableArea';
 import { TaskCard } from '@/components/TaskCard';
 import { useLocationNotification } from '@/hooks/useLocationNotification';
@@ -29,6 +29,11 @@ const initialTasks = [
     priority: 'high',
     notificationType: 'none',
     tags: [],
+    pomodoroTimeLeft: 25 * 60,
+    pomodoroIsRunning: false,
+    pomodoroIsBreak: false,
+    pomodoroSessions: 0,
+    pomodoroActive: false,
   },
   {
     id: 2,
@@ -40,6 +45,11 @@ const initialTasks = [
     priority: 'medium',
     notificationType: 'none',
     tags: [],
+    pomodoroTimeLeft: 25 * 60,
+    pomodoroIsRunning: false,
+    pomodoroIsBreak: false,
+    pomodoroSessions: 0,
+    pomodoroActive: false,
   },
   {
     id: 3,
@@ -51,6 +61,11 @@ const initialTasks = [
     priority: 'low',
     notificationType: 'none',
     tags: [],
+    pomodoroTimeLeft: 25 * 60,
+    pomodoroIsRunning: false,
+    pomodoroIsBreak: false,
+    pomodoroSessions: 0,
+    pomodoroActive: false,
   },
 ];
 
@@ -81,8 +96,8 @@ const DashboardPage = () => {
     setStartedTasks(newTasks);
   };
 
-  const handleTaskUpdate = (newTasks: any[]) => {
-    setStartedTasks(newTasks);
+  const handleTaskUpdate = (updatedTasks: any[]) => {
+    setStartedTasks(updatedTasks);
   };
 
   const handleAddTask = (newTask: {
@@ -105,6 +120,11 @@ const DashboardPage = () => {
         timeSlot: '',
         completed: false,
         locked: false,
+        pomodoroTimeLeft: 25 * 60,
+        pomodoroIsRunning: false,
+        pomodoroIsBreak: false,
+        pomodoroSessions: 0,
+        pomodoroActive: false,
       },
     ]);
   };
@@ -144,7 +164,7 @@ const DashboardPage = () => {
         setUnstartedTasks(unstartedTasks.filter((t) => t.id !== activeId));
         setStartedTasks([
           ...startedTasks,
-          { ...activeTask, timeSlot: newTimeSlot },
+          { ...activeTask, timeSlot: newTimeSlot, pomodoroTimeLeft: 25 * 60, pomodoroIsRunning: false, pomodoroIsBreak: false, pomodoroSessions: 0, pomodoroActive: false },
         ]);
       } else if (overId === 'started-tasks') {
         // Reordering within started tasks is handled by TodaySchedule
@@ -194,7 +214,7 @@ const DashboardPage = () => {
               handleAddTask({ ...task, timeSlot: undefined })
             }
           />
-          <PomodoroTimer />
+          
         </div>
       </div>
     </DndContext>
