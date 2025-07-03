@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { 
   Calendar, Timer, BarChart3, Gift, Users, 
-  CalendarDays, Settings, Home, Menu 
+  CalendarDays, Settings, Home, Menu, Bell 
 } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
@@ -33,7 +33,7 @@ const activityAndCommunityMenuItems = [
 ];
 
 const settingsMenuItems = [
-  { title: "타이머 & 알림", url: "/timer", icon: Timer },
+  { title: "알림", url: "/timer", icon: Bell },
   { title: "일반 설정", url: "/settings", icon: Settings },
 ];
 

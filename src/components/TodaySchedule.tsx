@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect } from 'react';
 import {
   DndContext,
@@ -16,6 +18,7 @@ import { Clock, Calendar, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AddTaskModal } from './AddTaskModal';
 import { cn } from '@/lib/utils';
+import { PomodoroTimer } from './PomodoroTimer'; // PomodoroTimer 임포트
 
 interface Task {
   id: number | string;
@@ -32,6 +35,11 @@ interface Task {
   notificationType: 'time' | 'location' | 'none';
   dueDate?: string;
   tags?: string[];
+  pomodoroTimeLeft: number; // 남은 시간 (초)
+  pomodoroIsRunning: boolean; // 타이머 실행 여부
+  pomodoroIsBreak: boolean; // 휴식 시간 여부
+  pomodoroSessions: number; // 완료된 포모도로 세션 수
+  pomodoroActive: boolean; // 포모도로 타이머 활성화 여부 (시작 버튼 클릭 시 true)
 }
 
 interface TodayScheduleProps {
@@ -45,7 +53,7 @@ interface TodayScheduleProps {
   }) => void;
 }
 
-const SortableTaskCard = ({ task, onTaskComplete }) => {
+const SortableTaskCard = ({ task, onTaskComplete, onStartTimer }) => { // onStartTimer prop 추가
   const {
     attributes,
     listeners,
@@ -61,8 +69,8 @@ const SortableTaskCard = ({ task, onTaskComplete }) => {
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <TaskCard task={task} onComplete={onTaskComplete} />
+    <div ref={setNodeRef} style={style}>
+      <TaskCard task={task} onComplete={onTaskComplete} onStartTimer={onStartTimer} attributes={attributes} listeners={listeners} />
     </div>
   );
 };
@@ -85,6 +93,62 @@ export const TodaySchedule = ({
 
   const { setNodeRef, isOver } = useDroppable({ id: 'started-tasks' });
 
+  const handleStartTimer = (taskId: number | string) => {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId
+        ? { 
+            ...task,
+            pomodoroActive: !task.pomodoroActive, // pomodoroActive 토글
+            pomodoroIsRunning: !task.pomodoroActive ? true : false, // pomodoroActive가 true가 되면 isRunning도 true로, 아니면 false
+          }
+        : task
+    );
+    onTaskUpdate(updatedTasks);
+  };
+
+  const handlePomodoroUpdate = (taskId: number | string, newTimeLeft: number, newIsRunning: boolean, newIsBreak: boolean, newSessions: number) => {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId
+        ? { 
+            ...task,
+            pomodoroTimeLeft: newTimeLeft,
+            pomodoroIsRunning: newIsRunning,
+            pomodoroIsBreak: newIsBreak,
+            pomodoroSessions: newSessions,
+          }
+        : task
+    );
+    onTaskUpdate(updatedTasks);
+  };
+
+  const handlePomodoroCompleteSession = (taskId: number | string, newSessions: number, newIsBreak: boolean, newTimeLeft: number) => {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId
+        ? { 
+            ...task,
+            pomodoroSessions: newSessions,
+            pomodoroIsBreak: newIsBreak,
+            pomodoroTimeLeft: newTimeLeft,
+            pomodoroIsRunning: false, // 세션 완료 시 타이머 중지
+          }
+        : task
+    );
+    onTaskUpdate(updatedTasks);
+  };
+
+  const handlePomodoroReset = (taskId: number | string, initialTime: number, initialIsBreak: boolean) => {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId
+        ? { 
+            ...task,
+            pomodoroTimeLeft: initialTime,
+            pomodoroIsRunning: false,
+            pomodoroIsBreak: initialIsBreak,
+          }
+        : task
+    );
+    onTaskUpdate(updatedTasks);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -112,8 +176,6 @@ export const TodaySchedule = ({
         </div>
       </div>
 
-      
-
         <div
           ref={setNodeRef}
           className={cn(
@@ -128,11 +190,31 @@ export const TodaySchedule = ({
             <div className="space-y-2">
               {tasks.length > 0 ? (
                 tasks.map((task) => (
-                  <SortableTaskCard
-                    key={task.id}
-                    task={task}
-                    onTaskComplete={() => onTaskComplete(task.id)}
-                  />
+                  <div key={task.id}>
+                    <SortableTaskCard
+                      task={task}
+                      onTaskComplete={() => onTaskComplete(task.id)}
+                      onStartTimer={handleStartTimer}
+                    />
+                    {task.pomodoroActive && (
+                      <div className="mt-4">
+                        <PomodoroTimer
+                          taskId={task.id}
+                          taskTitle={task.title}
+                          timeLeft={task.pomodoroTimeLeft}
+                          isRunning={task.pomodoroIsRunning}
+                          isBreak={task.pomodoroIsBreak}
+                          sessions={task.pomodoroSessions}
+                          onTimeLeftChange={(newTime) => handlePomodoroUpdate(task.id, newTime, task.pomodoroIsRunning, task.pomodoroIsBreak, task.pomodoroSessions)}
+                          onIsRunningChange={(newIsRunning) => handlePomodoroUpdate(task.id, task.pomodoroTimeLeft, newIsRunning, task.pomodoroIsBreak, task.pomodoroSessions)}
+                          onIsBreakChange={(newIsBreak) => handlePomodoroUpdate(task.id, task.pomodoroTimeLeft, task.pomodoroIsRunning, newIsBreak, task.pomodoroSessions)}
+                          onSessionsChange={(newSessions) => handlePomodoroUpdate(task.id, task.pomodoroTimeLeft, task.pomodoroIsRunning, task.pomodoroIsBreak, newSessions)}
+                          onCompleteSession={(newSessions, newIsBreak, newTimeLeft) => handlePomodoroCompleteSession(task.id, newSessions, newIsBreak, newTimeLeft)}
+                          onResetTimer={(initialTime, initialIsBreak) => handlePomodoroReset(task.id, initialTime, initialIsBreak)}
+                        />
+                      </div>
+                    )}
+                  </div>
                 ))
               ) : (
                 <div className="text-center py-10">
@@ -145,8 +227,6 @@ export const TodaySchedule = ({
             </div>
           </SortableContext>
         </div>
-
-      
     </div>
   );
 };

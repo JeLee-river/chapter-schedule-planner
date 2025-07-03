@@ -34,7 +34,6 @@ export const useLocationNotification = (tasks: Task[], radius: number = 100) => 
       if ('Notification' in window && 'geolocation' in navigator) {
         const notificationPermission = await Notification.requestPermission();
         if (notificationPermission !== 'granted') {
-          console.log('Notification permission not granted.');
           return;
         }
 
@@ -42,7 +41,6 @@ export const useLocationNotification = (tasks: Task[], radius: number = 100) => 
           () => { startWatching(); },
           (error) => {
             if (error.code === error.PERMISSION_DENIED) {
-              console.log('Geolocation permission denied.');
             }
           }
         );

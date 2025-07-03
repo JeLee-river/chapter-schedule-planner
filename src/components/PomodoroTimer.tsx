@@ -5,11 +5,35 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 
-export const PomodoroTimer = () => {
-  const [timeLeft, setTimeLeft] = useState(25 * 60); // 25분
-  const [isRunning, setIsRunning] = useState(false);
-  const [isBreak, setIsBreak] = useState(false);
-  const [sessions, setSessions] = useState(0);
+interface PomodoroTimerProps {
+  taskId: number | string;
+  taskTitle: string;
+  timeLeft: number;
+  isRunning: boolean;
+  isBreak: boolean;
+  sessions: number;
+  onTimeLeftChange: (newTime: number) => void;
+  onIsRunningChange: (newIsRunning: boolean) => void;
+  onIsBreakChange: (newIsBreak: boolean) => void;
+  onSessionsChange: (newSessions: number) => void;
+  onCompleteSession: (newSessions: number, newIsBreak: boolean, newTimeLeft: number) => void;
+  onResetTimer: (initialTime: number, initialIsBreak: boolean) => void;
+}
+
+export const PomodoroTimer = ({
+  taskId,
+  taskTitle,
+  timeLeft,
+  isRunning,
+  isBreak,
+  sessions,
+  onTimeLeftChange,
+  onIsRunningChange,
+  onIsBreakChange,
+  onSessionsChange,
+  onCompleteSession,
+  onResetTimer,
+}: PomodoroTimerProps) => {
   const { toast } = useToast();
 
   const workDuration = 25 * 60; // 25분
@@ -21,52 +45,50 @@ export const PomodoroTimer = () => {
     
     if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
+        onTimeLeftChange(timeLeft - 1);
       }, 1000);
     } else if (timeLeft === 0) {
       handleSessionComplete();
     }
 
     return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
+  }, [isRunning, timeLeft, onTimeLeftChange]);
 
   const handleSessionComplete = () => {
-    setIsRunning(false);
+    onIsRunningChange(false);
     
     if (!isBreak) {
       // 작업 세션 완료
-      setSessions(prev => prev + 1);
+      const newSessions = sessions + 1;
+      onSessionsChange(newSessions);
       toast({
         title: "포모도로 세션 완료! 🍅",
         description: "훌륭합니다! 잠시 휴식을 취하세요. +25 포인트를 획득했습니다!",
       });
       
       // 4번째 세션 후 긴 휴식
-      const nextBreakDuration = (sessions + 1) % 4 === 0 ? longBreakDuration : breakDuration;
-      setTimeLeft(nextBreakDuration);
-      setIsBreak(true);
+      const nextBreakDuration = (newSessions) % 4 === 0 ? longBreakDuration : breakDuration;
+      onCompleteSession(newSessions, true, nextBreakDuration);
     } else {
       // 휴식 완료
       toast({
         title: "휴식 시간 종료! ⏰",
         description: "다음 포모도로 세션을 시작하세요!",
       });
-      setTimeLeft(workDuration);
-      setIsBreak(false);
+      onCompleteSession(sessions, false, workDuration);
     }
   };
 
   const handleStart = () => {
-    setIsRunning(true);
+    onIsRunningChange(true);
   };
 
   const handlePause = () => {
-    setIsRunning(false);
+    onIsRunningChange(false);
   };
 
   const handleReset = () => {
-    setIsRunning(false);
-    setTimeLeft(isBreak ? breakDuration : workDuration);
+    onResetTimer(isBreak ? breakDuration : workDuration, isBreak);
   };
 
   const formatTime = (seconds: number) => {
@@ -84,7 +106,7 @@ export const PomodoroTimer = () => {
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-lg border border-white/20">
       <div className="text-center space-y-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-900">포모도로 타이머</h3>
+          <h3 className="text-xl font-bold text-gray-900">포모도로 타이머 - {taskTitle}</h3> {/* taskTitle 표시 */}
           <Button variant="outline" size="sm">
             <Settings className="w-4 h-4" />
           </Button>
