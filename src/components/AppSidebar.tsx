@@ -33,7 +33,6 @@ const activityAndCommunityMenuItems = [
 ];
 
 const settingsMenuItems = [
-  { title: "캘린더 연동", url: "/calendar", icon: CalendarDays },
   { title: "타이머 & 알림", url: "/timer", icon: Timer },
   { title: "일반 설정", url: "/settings", icon: Settings },
 ];
