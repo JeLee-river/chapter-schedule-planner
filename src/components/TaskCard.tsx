@@ -18,6 +18,7 @@ interface Task {
     latitude: number;
     longitude: number;
   };
+  tags?: string[];
 }
 
 interface TaskCardProps {
@@ -114,6 +115,15 @@ export const TaskCard = ({ task, onComplete, isDragging: propIsDragging }: TaskC
             </Badge>
             {task.location && <MapPin className="w-4 h-4 text-gray-400" />}
           </div>
+          {task.tags && task.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-1">
+              {task.tags.map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
           
           <div className="flex items-center space-x-4 text-sm text-gray-500">
             <div className="flex items-center space-x-1">
