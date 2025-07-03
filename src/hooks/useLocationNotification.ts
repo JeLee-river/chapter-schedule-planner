@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 
 interface Task {
@@ -8,6 +9,7 @@ interface Task {
     latitude: number;
     longitude: number;
   };
+  notificationType?: 'time' | 'location' | 'none';
 }
 
 const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {

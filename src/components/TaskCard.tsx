@@ -19,6 +19,7 @@ interface Task {
     longitude: number;
   };
   tags?: string[];
+  pomodoroActive?: boolean;
 }
 
 interface TaskCardProps {

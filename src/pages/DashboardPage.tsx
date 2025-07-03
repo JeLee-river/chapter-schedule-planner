@@ -27,7 +27,7 @@ const initialTasks = [
     completed: false,
     locked: false,
     priority: 'high',
-    notificationType: 'none',
+    notificationType: 'none' as const,
     tags: [],
     pomodoroTimeLeft: 25 * 60,
     pomodoroIsRunning: false,
@@ -43,7 +43,7 @@ const initialTasks = [
     completed: false,
     locked: false,
     priority: 'medium',
-    notificationType: 'none',
+    notificationType: 'none' as const,
     tags: [],
     pomodoroTimeLeft: 25 * 60,
     pomodoroIsRunning: false,
@@ -59,7 +59,7 @@ const initialTasks = [
     completed: false,
     locked: false,
     priority: 'low',
-    notificationType: 'none',
+    notificationType: 'none' as const,
     tags: [],
     pomodoroTimeLeft: 25 * 60,
     pomodoroIsRunning: false,
@@ -120,6 +120,8 @@ const DashboardPage = () => {
         timeSlot: '',
         completed: false,
         locked: false,
+        notificationType: 'none' as const,
+        tags: [],
         pomodoroTimeLeft: 25 * 60,
         pomodoroIsRunning: false,
         pomodoroIsBreak: false,
@@ -191,9 +193,7 @@ const DashboardPage = () => {
             tasks={startedTasks}
             onTaskComplete={handleTaskComplete}
             onTaskUpdate={handleTaskUpdate}
-            onAddTask={(task) =>
-              handleAddTask({ ...task, timeSlot: undefined })
-            }
+            onAddTask={handleAddTask}
           />
         </div>
         <div className="space-y-4">
@@ -210,9 +210,7 @@ const DashboardPage = () => {
             </SortableContext>
           </DroppableArea>
           <TaskManager
-            onAddTask={(task) =>
-              handleAddTask({ ...task, timeSlot: undefined })
-            }
+            onAddTask={handleAddTask}
           />
           
         </div>
