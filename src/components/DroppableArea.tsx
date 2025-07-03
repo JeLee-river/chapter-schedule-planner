@@ -10,6 +10,8 @@ interface DroppableAreaProps {
 
 export const DroppableArea = ({ id, children, title }: DroppableAreaProps) => {
   const { setNodeRef, isOver } = useDroppable({ id });
+  
+  
 
   return (
     <div
