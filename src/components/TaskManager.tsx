@@ -13,12 +13,14 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useDraggable } from '@dnd-kit/core';
 import { cn } from '@/lib/utils';
+import { AddTaskModal } from './AddTaskModal';
 
 interface TaskManagerProps {
   onAddTask: (task: {
     title: string;
     duration: number;
     priority: string;
+    location?: { latitude: number; longitude: number; };
   }) => void;
 }
 
@@ -52,6 +54,7 @@ const DraggableTask = ({ taskData, isDragging }) => {
 };
 
 export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [newTask, setNewTask] = useState('');
   const [taskDuration, setTaskDuration] = useState('30');
   const [taskPriority, setTaskPriority] = useState('medium');
@@ -90,14 +93,10 @@ export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-bold text-gray-900">빠른 작업 추가</h3>
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm">
-            <Filter className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
-        </div>
+        <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)}>
+            <Settings className="w-4 h-4 mr-2" />
+            상세 설정
+        </Button>
       </div>
 
       <div className="space-y-4">
@@ -184,6 +183,7 @@ export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
           ))}
         </div>
       </div>
+      <AddTaskModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddTask={onAddTask} />
     </div>
   );
 };

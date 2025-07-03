@@ -25,6 +25,12 @@ interface Task {
   completed: boolean;
   locked: boolean;
   priority: string;
+  location?: {
+    latitude: number;
+    longitude: number;
+  };
+  notificationType: 'time' | 'location' | 'none';
+  dueDate?: string;
 }
 
 interface TodayScheduleProps {
@@ -45,6 +51,7 @@ const SortableTaskCard = ({ task, onTaskComplete }) => {
     setNodeRef,
     transform,
     transition,
+    isDragging,
   } = useSortable({ id: task.id });
 
   const style = {
@@ -54,7 +61,7 @@ const SortableTaskCard = ({ task, onTaskComplete }) => {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <TaskCard task={task} onComplete={() => onTaskComplete(task.id)} />
+      <TaskCard task={task} onComplete={onTaskComplete} />
     </div>
   );
 };
@@ -91,18 +98,6 @@ export const TodaySchedule = ({
     return () => clearInterval(timer);
   }, []);
 
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = tasks.findIndex((t) => t.id === active.id);
-      const newIndex = tasks.findIndex((t) => t.id === over.id);
-      if (oldIndex !== -1 && newIndex !== -1) {
-        onTaskUpdate(arrayMove(tasks, oldIndex, newIndex));
-      }
-    }
-  };
-
   return (
     <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-white/20">
       <div className="flex items-center justify-between mb-6">
@@ -118,7 +113,6 @@ export const TodaySchedule = ({
 
       
 
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div
           ref={setNodeRef}
           className={cn(
@@ -136,7 +130,7 @@ export const TodaySchedule = ({
                   <SortableTaskCard
                     key={task.id}
                     task={task}
-                    onTaskComplete={onTaskComplete}
+                    onTaskComplete={() => onTaskComplete(task.id)}
                   />
                 ))
               ) : (
@@ -150,20 +144,8 @@ export const TodaySchedule = ({
             </div>
           </SortableContext>
         </div>
-      </DndContext>
 
-      <Button
-        className="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-        onClick={() => setIsModalOpen(true)}
-      >
-        <Plus className="w-4 h-4 mr-2" />새 작업 추가
-      </Button>
-
-      <AddTaskModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAddTask={onAddTask}
-      />
+      
     </div>
   );
 };

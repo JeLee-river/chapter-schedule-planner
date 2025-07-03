@@ -15,6 +15,8 @@ import { TaskManager } from '@/components/TaskManager';
 import { PomodoroTimer } from '@/components/PomodoroTimer';
 import { DroppableArea } from '@/components/DroppableArea';
 import { TaskCard } from '@/components/TaskCard';
+import { useLocationNotification } from '@/hooks/useLocationNotification';
+import { useTimeNotification } from '@/hooks/useTimeNotification';
 
 const initialTasks = [
   {
@@ -25,6 +27,7 @@ const initialTasks = [
     completed: false,
     locked: false,
     priority: 'high',
+    notificationType: 'none',
   },
   {
     id: 2,
@@ -34,6 +37,7 @@ const initialTasks = [
     completed: false,
     locked: false,
     priority: 'medium',
+    notificationType: 'none',
   },
   {
     id: 3,
@@ -43,6 +47,7 @@ const initialTasks = [
     completed: false,
     locked: false,
     priority: 'low',
+    notificationType: 'none',
   },
 ];
 
@@ -50,7 +55,13 @@ const DashboardPage = () => {
   const [unstartedTasks, setUnstartedTasks] = useState(initialTasks);
   const [startedTasks, setStartedTasks] = useState([]);
 
+  const allTasks = [...unstartedTasks, ...startedTasks];
+  useLocationNotification(allTasks);
+  useTimeNotification(allTasks);
+
   const handleTaskComplete = (taskId: number | string) => {
+    
+    
     const newTasks = startedTasks.map((task) => {
       if (task.id === taskId) {
         return { ...task, completed: !task.completed };
@@ -113,30 +124,31 @@ const DashboardPage = () => {
     const isOverUnstarted = overId === 'unstarted-tasks';
     const isOverStarted = over.id.toString().startsWith('time-slot-');
 
-    const sourceList = unstartedTasks.some((t) => t.id === activeId)
-      ? unstartedTasks
-      : startedTasks;
-    const setSourceList = unstartedTasks.some((t) => t.id === activeId)
-      ? setUnstartedTasks
-      : setStartedTasks;
+    const sourceListId = unstartedTasks.some((t) => t.id === activeId)
+      ? 'unstarted'
+      : 'started';
 
-    if (isOverStarted || overId === 'started-tasks') {
+    
+
+    if (overId === 'started-tasks' || over.id.toString().startsWith('time-slot-')) {
+      // From unstarted to started, or reordering within started
       let newTimeSlot = '';
       if (over.id.toString().startsWith('time-slot-')) {
         newTimeSlot = (over.data.current as { time: string }).time;
       }
 
-      if (sourceList === unstartedTasks) {
+      if (sourceListId === 'unstarted') {
         setUnstartedTasks(unstartedTasks.filter((t) => t.id !== activeId));
         setStartedTasks([
           ...startedTasks,
           { ...activeTask, timeSlot: newTimeSlot },
         ]);
-      } else {
+      } else if (overId === 'started-tasks') {
         // Reordering within started tasks is handled by TodaySchedule
       }
-    } else if (isOverUnstarted) {
-      if (sourceList === startedTasks) {
+    } else if (overId === 'unstarted-tasks') {
+      // From started to unstarted
+      if (sourceListId === 'started') {
         setStartedTasks(startedTasks.filter((t) => t.id !== activeId));
         setUnstartedTasks([...unstartedTasks, { ...activeTask, timeSlot: '' }]);
       } else {
@@ -169,7 +181,7 @@ const DashboardPage = () => {
             >
               <div className="space-y-2">
                 {unstartedTasks.map((task) => (
-                  <DraggableTaskCard key={task.id} task={task} />
+                  <DraggableTaskCard key={task.id} task={task} onTaskComplete={handleTaskComplete} />
                 ))}
               </div>
             </SortableContext>
@@ -186,8 +198,8 @@ const DashboardPage = () => {
   );
 };
 
-const DraggableTaskCard = ({ task }) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+const DraggableTaskCard = ({ task, onTaskComplete }) => {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
     data: task,
   });
@@ -200,7 +212,7 @@ const DraggableTaskCard = ({ task }) => {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <TaskCard task={task} onComplete={() => {}} />
+      <TaskCard task={task} onComplete={() => onTaskComplete(task.id)} isDragging={isDragging} />
     </div>
   );
 };

@@ -12,7 +12,7 @@ import TimerNotificationPage from "./pages/TimerNotificationPage";
 import ReportPage from "./pages/ReportPage";
 import RewardPage from "./pages/RewardPage";
 import SocialTeamPage from "./pages/SocialTeamPage";
-import CalendarIntegrationPage from "./pages/CalendarIntegrationPage";
+
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
@@ -41,7 +41,7 @@ const App = () => (
                   <Route path="/reports" element={<ReportPage />} />
                   <Route path="/rewards" element={<RewardPage />} />
                   <Route path="/social" element={<SocialTeamPage />} />
-                  <Route path="/calendar" element={<CalendarIntegrationPage />} />
+                  
                   <Route path="/settings" element={<SettingsPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
