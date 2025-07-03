@@ -1,14 +1,55 @@
 
 import { useState } from 'react';
-import { Plus, Settings, Filter } from 'lucide-react';
+import { Plus, Settings, Filter, GripVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useDraggable } from '@dnd-kit/core';
+import { cn } from '@/lib/utils';
 
 interface TaskManagerProps {
-  onAddTask: (task: { title: string; duration: number; priority: string }) => void;
+  onAddTask: (task: {
+    title: string;
+    duration: number;
+    priority: string;
+  }) => void;
 }
+
+const DraggableTask = ({ taskData, isDragging }) => {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: 'draggable-task-manager-item',
+    data: taskData,
+  });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        'p-2 rounded-lg flex items-center space-x-2 bg-gray-100 border-2 border-dashed',
+        isDragging && 'opacity-50 shadow-lg'
+      )}
+    >
+      <div {...listeners} {...attributes} className="cursor-grab">
+        <GripVertical className="w-5 h-5 text-gray-500" />
+      </div>
+      <span>{taskData.title || '새 작업'}</span>
+    </div>
+  );
+};
 
 export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
   const [newTask, setNewTask] = useState('');
@@ -16,23 +57,33 @@ export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
   const [taskPriority, setTaskPriority] = useState('medium');
   const { toast } = useToast();
 
+  const { isDragging } = useDraggable({
+    id: 'draggable-task-manager-item',
+  });
+
   const handleAddTask = () => {
     if (newTask.trim()) {
       const taskData = {
         title: newTask,
         duration: parseInt(taskDuration),
-        priority: taskPriority
+        priority: taskPriority,
       };
-      
+
       onAddTask(taskData);
-      
+
       toast({
-        title: "작업이 추가되었습니다",
+        title: '작업이 추가되었습니다',
         description: `"${newTask}"이(가) 오늘 일정에 추가되었습니다.`,
       });
-      
+
       setNewTask('');
     }
+  };
+
+  const taskData = {
+    title: newTask,
+    duration: parseInt(taskDuration),
+    priority: taskPriority,
   };
 
   return (
@@ -96,9 +147,10 @@ export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
             </Select>
           </div>
         </div>
+        <DraggableTask taskData={taskData} isDragging={isDragging} />
 
-        <Button 
-          onClick={handleAddTask} 
+        <Button
+          onClick={handleAddTask}
           className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
           disabled={!newTask.trim()}
         >
@@ -117,10 +169,10 @@ export const TaskManager = ({ onAddTask }: TaskManagerProps) => {
             { name: '코드 리뷰', duration: '45분' },
             { name: '문서 작성', duration: '1시간' },
           ].map((template, index) => (
-            <Button 
+            <Button
               key={index}
-              variant="outline" 
-              size="sm" 
+              variant="outline"
+              size="sm"
               className="text-xs justify-start"
               onClick={() => {
                 setNewTask(template.name);
