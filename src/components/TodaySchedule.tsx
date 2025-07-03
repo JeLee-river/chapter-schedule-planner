@@ -31,6 +31,7 @@ interface Task {
   };
   notificationType: 'time' | 'location' | 'none';
   dueDate?: string;
+  tags?: string[];
 }
 
 interface TodayScheduleProps {

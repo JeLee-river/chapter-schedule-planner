@@ -28,6 +28,7 @@ const initialTasks = [
     locked: false,
     priority: 'high',
     notificationType: 'none',
+    tags: [],
   },
   {
     id: 2,
@@ -38,6 +39,7 @@ const initialTasks = [
     locked: false,
     priority: 'medium',
     notificationType: 'none',
+    tags: [],
   },
   {
     id: 3,
@@ -48,6 +50,7 @@ const initialTasks = [
     locked: false,
     priority: 'low',
     notificationType: 'none',
+    tags: [],
   },
 ];
 

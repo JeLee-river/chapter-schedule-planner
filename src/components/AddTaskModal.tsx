@@ -18,6 +18,7 @@ interface AddTaskModalProps {
     location?: { latitude: number; longitude: number; };
     notificationType: 'time' | 'location' | 'none';
     dueDate?: string;
+    tags?: string[];
   }) => void;
 }
 
@@ -30,6 +31,7 @@ export function AddTaskModal({ isOpen, onClose, onAddTask }: AddTaskModalProps) 
   const [isCustomTime, setIsCustomTime] = useState(false);
   const [notificationType, setNotificationType] = useState<'time' | 'location' | 'none'>('none');
   const [dueDate, setDueDate] = useState<string | undefined>(undefined);
+  const [tags, setTags] = useState<string>("");
 
   const handleAddLocation = () => {
     if (navigator.geolocation) {
@@ -61,6 +63,7 @@ export function AddTaskModal({ isOpen, onClose, onAddTask }: AddTaskModalProps) 
       location,
       notificationType,
       dueDate,
+      tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
     });
     setTitle("");
     setDuration("30");
@@ -70,6 +73,7 @@ export function AddTaskModal({ isOpen, onClose, onAddTask }: AddTaskModalProps) 
     setIsCustomTime(false);
     setNotificationType('none');
     setDueDate(undefined);
+    setTags("");
     onClose();
   };
 
@@ -121,6 +125,18 @@ export function AddTaskModal({ isOpen, onClose, onAddTask }: AddTaskModalProps) 
                 <SelectItem value="low">낮음</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="tags" className="text-right">
+              태그 (쉼표로 구분)
+            </Label>
+            <Input
+              id="tags"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              className="col-span-3"
+              placeholder="예: 공부, 운동, 개인"
+            />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">알림 유형</Label>
