@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { 
   Calendar, Timer, BarChart3, Gift, Users, 
-  CalendarDays, Settings, Home, Menu, Bell 
+  CalendarDays, Settings, Home, Menu, Bell, Video 
 } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
@@ -28,7 +28,7 @@ const reportMenuItems = [
 ];
 
 const activityAndCommunityMenuItems = [
-  { title: "소셜 & 팀", url: "/social", icon: Users },
+  { title: "가상 코워킹", url: "/cowork", icon: Video },
   { title: "리워드", url: "/rewards", icon: Gift },
 ];
 
